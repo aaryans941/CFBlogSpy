@@ -1,0 +1,5 @@
+discord
+html2txt
+datetime
+requests
+json
