@@ -1,6 +1,5 @@
 # CFBlogSpy
 A discord bot to browse [Codeforces](https://codeforces.com/) blogs with desired filters, implemented in python, using [Codeforces API](https://codeforces.com/apiHelp).
-(The code is to be refactored, with structural changes)
 
 ## How to run:
 
