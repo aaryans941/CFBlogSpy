@@ -58,7 +58,7 @@ async def user_blogs(ctx, handle, *args):
                 else:
                     ubt = min(ubt , timestamp)
        
-       elif len(arg) >= 3 and arg[:3] in [ 'r<<' , 'r>=' ]:
+        elif len(arg) >= 3 and arg[:3] in [ 'r<<' , 'r>=' ]:
             arg_type, arg_val = arg[:3], arg[3:]
             rating, err = get_rating_bound(arg_val)
             if rating is None:
@@ -71,11 +71,11 @@ async def user_blogs(ctx, handle, *args):
                 else:
                     ubr = min(ubr , rating)
        
-       elif arg[:1] == '+':
+        elif arg[:1] == '+':
             arg_val = arg[1:]
             tags.append(arg_val)
        
-       else:
+        else:
             parameter_check = False
             response = get_error_embed('Invalid parameters', 'Please enter valid parameters and try again')
             break
