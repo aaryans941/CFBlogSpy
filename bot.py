@@ -93,4 +93,57 @@ async def user_blogs(ctx, handle, *args):
         response = get_error_embed(name='CF API Error', value=f"{obj['comment']}")
     await ctx.send(embed=response)
 
+@bot.command(name='gimme', help='Displays a random problem of a given tag within a rating range.', usage='tag [lower [upper]]')
+async def user_contest(ctx, tag, *args):
+    tag = tag.replace('-', '%20')
+    url = f'{CF_PROBLEM_TAGS}{tag}'
+    obj = requests.get(url)
+    data = json.loads(obj.text)
+    if data['status'] == "FAILED":
+        await ctx.send(f'{data["comment"]}')
+        return
+    elif len(data['result']['problems']) == 0:
+        await ctx.send(f'{tag} is not a valid tag on Codeforces.')
+        return
+
+    rat_lb, rat_ub = 0, 5000
+    var = 0
+    for arg in args :
+        if var == 2 :
+            await ctx.send('There should be at most two integers specifying the rating range.')
+            return
+        if utils.isValidInteger(arg) == False :
+            await ctx.send('The rating range should be in integer format only.')
+            return
+        arg = utils.isValidInteger(arg)
+        var = var + 1
+        if var == 1 :
+            rat_lb = max(rat_lb, arg)
+        if var == 2 :
+            rat_ub = min(rat_ub, arg)
+
+    problems = []
+    for prob in data['result']['problems'] :
+        if 'rating' not in prob:
+            continue
+        else :
+            if prob['rating'] >= rat_lb and prob['rating'] <= rat_ub :
+                problems.append(prob)
+
+    if len(problems) == 0 :
+        await ctx.send('No problem fit within your given rating range.')
+        return
+
+    rand_prob = random.choice(problems)
+
+    url = f'https://codeforces.com/api/contest.standings?contestId={rand_prob["contestId"]}&from=1&count=1&showUnofficial=true'
+    obj = requests.get(url)
+    data = json.loads(obj.text)
+    name = data['result']['contest']['name']
+    url = f'https://codeforces.com/contest/{rand_prob["contestId"]}/problem/{rand_prob["index"]}'
+
+    embed = discord.Embed(description=f'[{rand_prob["contestId"]}{rand_prob["index"]}. {rand_prob["name"]}]({url})', color=0x000000)
+    embed.add_field(name=f'{name}', value=f'Rating : {rand_prob["rating"]}', inline=False)   
+    await ctx.channel.send(embed=embed)
+
 bot.run(TOKEN)
